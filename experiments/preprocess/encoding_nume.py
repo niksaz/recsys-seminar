@@ -102,17 +102,24 @@ class NumEncoder(object):
             df[item+'_t_count'] = feat_encoding['count']
             self.tgt_nume_col.append(item+'_t_mean')
             self.tgt_nume_col.append(item+'_t_count')
-        
+
+        trn_y = np.array(df[self.label_name].values).reshape((-1, 1))
+        np.save(outPath + '_labels.npy', trn_y)
+        del trn_y
+        gc.collect()
         print('Start manual binary encode')
         rows = None
         for item in tqdm(self.nume_col+self.tgt_nume_col):
             feats = df[item].values
             if rows is None:
-                rows = feats.reshape((-1,1))
+                rows_new = feats.reshape((-1,1))
             else:
-                rows = np.concatenate([rows,feats.reshape((-1,1))],axis=1)
+                rows_new = np.concatenate([rows,feats.reshape((-1,1))],axis=1)
+            del rows
             del feats
+            df = df.drop(columns=[item])
             gc.collect()
+            rows = rows_new
         for item in tqdm(self.cate_col):
             feats = df[item].values
             Max = df[item].max()
@@ -120,15 +127,18 @@ class NumEncoder(object):
             samples = self.samples
             self.Max_len[item] = bit_len
             res = unpackbits(feats, bit_len).reshape((samples,-1))
-            rows = np.concatenate([rows,res],axis=1)
+            rows_new = np.concatenate([rows,res],axis=1)
+            del rows
             del feats
+            df = df.drop(columns=[item])
             gc.collect()
-        trn_y = np.array(df[self.label_name].values).reshape((-1,1))
+            rows = rows_new
         del df
         gc.collect()
         trn_x = np.array(rows)
         np.save(outPath+'_features.npy', trn_x)
-        np.save(outPath+'_labels.npy', trn_y)
+        del trn_x
+        gc.collect()
 
     # for test dataset
     def transform(self, inPath, outPath):
