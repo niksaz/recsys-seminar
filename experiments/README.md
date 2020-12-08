@@ -18,7 +18,7 @@ There are five main folders in the project, `data` is for data storage,
 `models` contains all the implementation codes of the proposed model 
 and other baseline models, `preprocess` is the folder containing
 feature selection and encoding, `online_scripts`
-(online experiments) and `scripts` (offline experiments) stores the
+(online experiments) and `offline_scripts` (offline experiments) stores the
 scripts/parameters of our experiments. 
 
 Moreover, `main.py` is the entry code file for offline 
