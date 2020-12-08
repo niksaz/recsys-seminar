@@ -87,7 +87,7 @@ random.seed(args.seeds[0])
 np.random.seed(args.seeds[0])
 torch.cuda.manual_seed_all(args.seeds[0])
 
-def TrainGBDT2(train_x, train_y, test_x, test_y, lr, num_trees, maxleaf):
+def TrainGBDT2(train_x, train_y, test_x, test_y, lr, num_trees, maxleaf, seed):
     num_class = 1
     if args.task == 'regression':
         objective = "regression"
@@ -112,6 +112,7 @@ def TrainGBDT2(train_x, train_y, test_x, test_y, lr, num_trees, maxleaf):
         'bagging_freq': 3,
         'bagging_fraction': 0.9,
         'learning_rate': lr,
+        'seed': seed,
     }
     lgb_train_y = train_y.reshape(-1)
     lgb_test_y = test_y.reshape(-1)
@@ -148,7 +149,7 @@ def gbdt_offline():
     vld_y = vld_y.astype(np.float32)
     trn_x, vld_x, mean, std = norm_data(trn_x, vld_x)
     maxleaf = args.maxleaf
-    gbm = TrainGBDT2(trn_x, trn_y, vld_x, vld_y, args.tree_lr, args.ntrees, maxleaf)
+    gbm = TrainGBDT2(trn_x, trn_y, vld_x, vld_y, args.tree_lr, args.ntrees, maxleaf, args.seed)
     for t in range(1, 5):
         trn_x = np.load(root+"%d_train_features.npy"%(t))
         trn_y = np.load(root+"%d_train_labels.npy"%(t))
@@ -178,7 +179,7 @@ def gbdt_online():
     vld_y = vld_y.astype(np.float32)
     trn_x, vld_x, mean, std = norm_data(trn_x, vld_x)
     maxleaf = args.maxleaf
-    gbm = TrainGBDT2(trn_x, trn_y, vld_x, vld_y, args.tree_lr, args.ntrees, maxleaf)
+    gbm = TrainGBDT2(trn_x, trn_y, vld_x, vld_y, args.tree_lr, args.ntrees, maxleaf, args.seed)
     for t in range(1, 5):
         trn_x = np.load(root+"%d_train_features.npy"%(t))
         trn_y = np.load(root+"%d_train_labels.npy"%(t))
