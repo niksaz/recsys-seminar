@@ -1,7 +1,12 @@
+from typing import List
+
 import numpy as np
 import lightgbm as lgb
 import random
 import math
+
+from simanneal import Annealer
+
 
 def countSplitNodes(tree):
     root = tree['tree_structure']
@@ -89,6 +94,7 @@ class ModelInterpreter(object):
     def GetChildren(self):
         return (self.listcl, self.listcr)
 
+
     def EqualGroup(self, n_clusters, args):
         vectors = {}
         # n_feature = 256
@@ -107,5 +113,60 @@ class ModelInterpreter(object):
             if idx < mod_per_cluster:
                 clusterIdx[keys[begin]] = idx
                 begin += 1
-        print([np.where(clusterIdx==i)[0].shape for i in range(n_clusters)])
         return clusterIdx
+
+    def OptimizedGroups(self, n_clusters, args):
+
+        clusterIdx = self.EqualGroup(n_clusters, args)
+
+        cfs, cluster_sets, tree_sets = compute_group_sizes(n_clusters, clusterIdx.astype(np.int), self.featurelist)
+        print("Cluster sets before:")
+        print(cluster_sets)
+        print(f"Feature sum: {sum(f_len for _, f_len in cluster_sets)}")
+
+        annealer = FeaturesAnnealer(n_clusters, clusterIdx, self.featurelist)
+        annealer.set_schedule(annealer.auto(minutes=0.2))
+        clusterIdx, bestSum = annealer.anneal()
+
+        cfs, cluster_sets, tree_sets = compute_group_sizes(n_clusters, clusterIdx.astype(np.int), self.featurelist)
+        print("Cluster sets after:")
+        print(cluster_sets)
+        print(f"Feature sum: {sum(f_len for _, f_len in cluster_sets)}")
+        return clusterIdx
+
+
+def compute_group_sizes(n_clusters, clusterIdx, featurelist):
+    cluster_feature_sets = [set() for _ in range(n_clusters)]
+    for cluster in range(n_clusters):
+        # print(cluster)
+        # print(clusterIdx)
+        # print(np.where(clusterIdx == cluster)[0])
+        for ind in np.where(clusterIdx == cluster)[0]:
+            # print(ind)
+            features = featurelist[ind]
+            cluster_feature_sets[cluster] |= set(features[features > 0])
+
+    cluster_sets = [(i, len(f_set)) for i, f_set in enumerate(cluster_feature_sets)]
+    tree_sets = [(i, len(set(f_set[f_set > 0]))) for i, f_set in enumerate(featurelist)]
+
+    return cluster_feature_sets, cluster_sets, tree_sets
+
+
+class FeaturesAnnealer(Annealer):
+
+    def __init__(self, n_clusters: int, clusterIdx: np.ndarray, featurelist: List[np.ndarray]):
+        self.featurelist = featurelist
+        self.n_clusters = n_clusters
+        state = clusterIdx.astype(np.int)
+        super(FeaturesAnnealer, self).__init__(state)
+
+    def move(self):
+        while 1:
+            i, j = np.random.randint(len(self.state), size=2)
+            if self.state[i] != self.state[j]:
+                self.state[i], self.state[j] = self.state[j], self.state[i]
+                break
+
+    def energy(self):
+        _, cluster_sets, _ = compute_group_sizes(self.n_clusters, self.state, self.featurelist)
+        return sum(f_len for _, f_len in cluster_sets)
