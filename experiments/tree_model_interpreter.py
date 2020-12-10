@@ -120,18 +120,19 @@ class ModelInterpreter(object):
         clusterIdx = self.EqualGroup(n_clusters, args)
 
         cfs, cluster_sets, tree_sets = compute_group_sizes(n_clusters, clusterIdx.astype(np.int), self.featurelist)
+        print(f"Features per group: {args.feat_per_group}")
         print("Cluster sets before:")
         print(cluster_sets)
-        print(f"Feature sum: {sum(f_len for _, f_len in cluster_sets)}")
+        print(f"Missed features: {sum(max(0, f_len - args.feat_per_group) for _, f_len in cluster_sets)}")
 
-        annealer = FeaturesAnnealer(n_clusters, clusterIdx, self.featurelist)
-        annealer.set_schedule(annealer.auto(minutes=0.2))
+        annealer = FeaturesAnnealer(n_clusters, clusterIdx, self.featurelist, args.feat_per_group)
+        annealer.set_schedule(annealer.auto(minutes=1.0))
         clusterIdx, bestSum = annealer.anneal()
 
         cfs, cluster_sets, tree_sets = compute_group_sizes(n_clusters, clusterIdx.astype(np.int), self.featurelist)
         print("Cluster sets after:")
         print(cluster_sets)
-        print(f"Feature sum: {sum(f_len for _, f_len in cluster_sets)}")
+        print(f"Missed features: {sum(max(0, f_len - args.feat_per_group) for _, f_len in cluster_sets)}")
         return clusterIdx
 
 
@@ -154,9 +155,10 @@ def compute_group_sizes(n_clusters, clusterIdx, featurelist):
 
 class FeaturesAnnealer(Annealer):
 
-    def __init__(self, n_clusters: int, clusterIdx: np.ndarray, featurelist: List[np.ndarray]):
+    def __init__(self, n_clusters: int, clusterIdx: np.ndarray, featurelist: List[np.ndarray], feat_per_group: int):
         self.featurelist = featurelist
         self.n_clusters = n_clusters
+        self.feat_per_group = feat_per_group
         state = clusterIdx.astype(np.int)
         super(FeaturesAnnealer, self).__init__(state)
 
@@ -169,4 +171,4 @@ class FeaturesAnnealer(Annealer):
 
     def energy(self):
         _, cluster_sets, _ = compute_group_sizes(self.n_clusters, self.state, self.featurelist)
-        return sum(f_len for _, f_len in cluster_sets)
+        return sum(max(0, f_len - self.feat_per_group) for _, f_len in cluster_sets)
