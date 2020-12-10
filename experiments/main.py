@@ -10,6 +10,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 
 from train_models import *
+from online_main import TrainGBDT2
 
 parser = argparse.ArgumentParser(description = 'DeepGBM Models')
 parser.add_argument('-data', type = str, default = 'YAHOO')
@@ -73,28 +74,60 @@ args.seeds = [int(x) for x in args.seed.split(',')]
 random.seed(args.seeds[0])
 np.random.seed(args.seeds[0])
 torch.cuda.manual_seed_all(args.seeds[0])
-    
+
+def train_gbdt(args, num_data, plot_title, key):
+    train_x, train_y, test_x, test_y = num_data
+    assert train_x.dtype == np.float32
+    assert train_y.dtype == np.float32
+    assert test_x.dtype == np.float32
+    assert test_y.dtype == np.float32
+    for seed in args.seeds:
+        gbm = TrainGBDT2(
+            train_x, train_y, test_x, test_y, args.tree_lr, args.ntrees, args.maxleaf, seed)
+    # for t in range(1, 5):
+    #     trn_x = np.load(root+"%d_train_features.npy"%(t))
+    #     trn_y = np.load(root+"%d_train_labels.npy"%(t))
+    #     vld_x = np.load(root+"%d_test_features.npy"%(t+1))
+    #     vld_y = np.load(root+"%d_test_labels.npy"%(t+1))
+    #     trn_x = trn_x.astype(np.float32)
+    #     trn_y = trn_y.astype(np.float32)
+    #     vld_x = vld_x.astype(np.float32)
+    #     vld_y = vld_y.astype(np.float32)
+    #     trn_x, vld_x, _, _ = norm_data(trn_x, vld_x, mean, std)
+    #     preds = gbm.predict(vld_x)
+    #     preds = preds.astype(np.float32)
+    #     # auc = sklearn.metrics.roc_auc_score(vld_y, preds)
+    #     metric = eval_metrics(args.task, vld_y, preds)
+    #     print(metric)
+
 def main():
     cate_model_list = ['deepfm', 'pnn', 'wideNdeep', 'lr', 'fm']
-    if args.model in cate_model_list:
+    model = args.model
+    if model in cate_model_list:
         cate_data = dh.load_data(args.data+'_cate')
         # designed for fast cateNN
         cate_data = dh.trans_cate_data(cate_data)
         train_cateModels(args, cate_data, plot_title, key="")
-    if "gbdt2nn" in args.model:
+    if "gbdt2nn" in model:
         num_data = dh.load_data(args.data+'_num')
         train_GBDT2NN(args, num_data, plot_title, key="", kd_type=args.kd_type)
-    elif args.model == "deepgbm":
+    elif model == "deepgbm":
         num_data = dh.load_data(args.data+'_num')
         cate_data = dh.load_data(args.data+'_cate')
         # designed for fast cateNN
         cate_data = dh.trans_cate_data(cate_data)
         train_DEEPGBM(args, num_data, cate_data, plot_title, key="")
-    elif args.model == 'd1':
+    elif model == 'd1':
         num_data = dh.load_data(args.data+'_num')
         cate_data = dh.load_data(args.data+'_cate')
         # designed for fast cateNN
         cate_data = dh.trans_cate_data(cate_data)
         train_D1(args, num_data, cate_data, plot_title, key="")
+    elif model == 'gbdt':
+        num_data = dh.load_data(args.data+'_num')
+        train_gbdt(args, num_data, plot_title, key="")
+    else:
+        raise ValueError(f"Unknown model name: {model}")
+
 if __name__ == '__main__':
     main()
