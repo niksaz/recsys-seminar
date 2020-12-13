@@ -55,14 +55,20 @@ class AdamW(torch.optim.Adam):
         return loss
 
 def eval_metrics(task, true, pred):
-    if task == 'binary':
+    if task == "binary":
         logloss = sklearn.metrics.log_loss(true.astype(np.float64), pred.astype(np.float64))
         auc = sklearn.metrics.roc_auc_score(true, pred)
         # error = 1-sklearn.metrics.accuracy_score(true,(pred+0.5).astype(np.int32))
         return (logloss, auc)#, error)
-    else:
+    elif task == "regression":
         mseloss = sklearn.metrics.mean_squared_error(true, pred)
         return mseloss
+    elif task == "multiclass":
+        pred_cls = np.argmax(pred, axis=1)
+        acc = sklearn.metrics.accuracy_score(true, pred_cls)
+        return (acc, acc)
+    else:
+        raise ValueError(f'Task is unknown: {task}')
 
 def EvalTestset(test_x, test_y, model, test_batch_size, test_x_opt=None):
     test_len = test_x.shape[0]

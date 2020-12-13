@@ -89,15 +89,22 @@ torch.cuda.manual_seed_all(args.seeds[0])
 
 def TrainGBDT2(train_x, train_y, test_x, test_y, lr, num_trees, maxleaf, seed):
     num_class = 1
-    if args.task == 'regression':
+    if args.task == "regression":
         objective = "regression"
         metric = "mse"
         boost_from_average = True
-    else:
+    elif args.task == "binary":
         objective = "binary"
         metric = "auc"
         num_class = 1
         boost_from_average = True
+    elif args.task == "multiclass":
+        objective = "multiclass"
+        metric = "multi_logloss"
+        num_class = len(np.unique(train_y))
+        boost_from_average = True
+    else:
+        raise ValueError(f"Task is unknown: {args.task}")
     params = {
         'task': 'train',
         'boosting_type': 'gbdt',
