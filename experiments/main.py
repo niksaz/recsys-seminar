@@ -108,7 +108,7 @@ def main():
         # designed for fast cateNN
         cate_data = dh.trans_cate_data(cate_data)
         train_cateModels(args, cate_data, plot_title, key="")
-    if "gbdt2nn" in model:
+    elif "gbdt2nn" in model:
         num_data = dh.load_data(args.data+'_num')
         train_GBDT2NN(args, num_data, plot_title, key="", kd_type=args.kd_type)
     elif model == "deepgbm":
