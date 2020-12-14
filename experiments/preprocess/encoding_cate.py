@@ -140,9 +140,9 @@ if __name__ == '__main__':
     # label_col = 'HasDetections'
 
     # for nips_a
-    nume_col = ['13', '14', '15', '19', '20', '21', '22', '23', '24', '25', '26', '28', '29', '41', '42', '43', '44', '45', '46', '47', '48', '49', '54']
-    cate_col = ['0', '2', '3', '4', '5', '6', '8', '9', '10', '11', '12', '16', '17', '18', '27', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '50', '51', '52', '53', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '72', '74', '75', '78', '80', '81']
-    label_col = 'label'
+    # nume_col = ['13', '14', '15', '19', '20', '21', '22', '23', '24', '25', '26', '28', '29', '41', '42', '43', '44', '45', '46', '47', '48', '49', '54']
+    # cate_col = ['0', '2', '3', '4', '5', '6', '8', '9', '10', '11', '12', '16', '17', '18', '27', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '50', '51', '52', '53', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '72', '74', '75', '78', '80', '81']
+    # label_col = 'label'
 
     
     # for nips_d
@@ -155,6 +155,18 @@ if __name__ == '__main__':
     # cate_col = ['0','1','2','3','4','6','7','8','10','17','18','19','20','21','22','23','24']
     # label_col = 'label'
 
+    # for expedia
+    nume_col = [
+        "orig_destination_distance", "srch_adults_cnt", "srch_children_cnt", "srch_rm_cnt", "cnt", "stay_duration",
+        "days2ci", "days2co", "srch_people_cnt", "same_continent_counts", "same_continent_ratio", "same_country_counts",
+        "same_country_ratio", "same_market_counts", "same_market_ratio"
+    ] + [f"d{i}" for i in range(1, 150)]
+    cate_col = [
+        "site_name", "posa_continent", "user_location_country", "user_location_region", "user_location_city",
+        "user_id", "is_mobile", "is_package", "channel", "srch_destination_type_id", "hotel_continent", "hotel_country",
+        "hotel_market", "ci_month"
+    ]
+    label_col = 'is_booking'
     
     if not os.path.isdir(args['out_dir']):
         os.mkdir(args['out_dir'])
