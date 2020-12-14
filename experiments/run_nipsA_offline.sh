@@ -1,5 +1,5 @@
 SCRIPTS_DIR=offline_scripts
-RESULTS_DIR=results/offline_scripts
+RESULTS_DIR=results/nipsA_offline
 
 bash $SCRIPTS_DIR/nipsA_lr_offline.sh > $RESULTS_DIR/nipsA_lr_offline.sh
 bash $SCRIPTS_DIR/nipsA_fm_offline.sh > $RESULTS_DIR/nipsA_fm_offline.sh

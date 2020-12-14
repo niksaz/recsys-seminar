@@ -1,5 +1,5 @@
 SCRIPTS_DIR=online_scripts
-RESULTS_DIR=results/online_scripts
+RESULTS_DIR=results/nipsA_online
 
 bash $SCRIPTS_DIR/nipsA_lr_online.sh > $RESULTS_DIR/nipsA_lr_online.txt
 bash $SCRIPTS_DIR/nipsA_fm_online.sh > $RESULTS_DIR/nipsA_fm_online.txt

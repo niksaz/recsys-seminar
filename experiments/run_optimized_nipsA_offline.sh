@@ -1,5 +1,5 @@
 SCRIPTS_DIR=offline_scripts
-RESULTS_DIR=results/optimized_offline_scripts
+RESULTS_DIR=results/optimized_nipsA_offline
 
 # Reverse order
 

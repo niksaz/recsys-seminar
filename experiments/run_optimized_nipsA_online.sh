@@ -1,5 +1,5 @@
 SCRIPTS_DIR=online_scripts
-RESULTS_DIR=results/optimized_online_scripts
+RESULTS_DIR=results/optimized_nipsA_online
 
 # Reverse order
 

@@ -157,7 +157,7 @@ def gbdt_offline():
     trn_x, vld_x, mean, std = norm_data(trn_x, vld_x)
     maxleaf = args.maxleaf
     gbm = TrainGBDT2(trn_x, trn_y, vld_x, vld_y, args.tree_lr, args.ntrees, maxleaf, args.seed)
-    for t in range(1, 4):
+    for t in range(1, 5):
         trn_x = np.load(root+"%d_train_features.npy"%(t))
         trn_y = np.load(root+"%d_train_labels.npy"%(t))
         vld_x = np.load(root+"%d_test_features.npy"%(t+1))
