@@ -1,3 +1,9 @@
+# Reproduction of the DeepGBM paper
+
+Here is the presentation with our results: [Google Slides](https://docs.google.com/presentation/d/e/2PACX-1vQaJIXFf0WTvV7pjsksBiI3QzvB_b8Rp7-jjK3hSj3zSaP1cWkEGauYCtpId7nzs8DQ7MSUi21Scl3K/pub?start=false&loop=false&delayms=3000) (in russian).
+
+Team members: Mikita Sazanovich, Egor Bogomolov, Katya Koschenko.
+
 # DeepGBM
 
 Implementation for the paper "DeepGBM: A Deep Learning Framework Distilled  by GBDT for Online Prediction Tasks", 
