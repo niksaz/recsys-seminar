@@ -105,7 +105,7 @@ def SubGBDTLeaf_cls(train_x, test_x, gbm, maxleaf, num_slices, args):
     rest_nt = n_trees
     modelI = ModelInterpreter(gbm, args)
     if args.group_method == 'Equal' or args.group_method == 'Random':
-        clusterIdx = modelI.EqualGroup(num_slices, args)
+        clusterIdx = modelI.OptimizedGroups(num_slices, args)
         n_feature = args.feat_per_group
     treeI = modelI.trees
     # rand = (args.group_method == 'Random')
